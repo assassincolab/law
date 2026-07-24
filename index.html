@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Warrior's DLO — AI-Powered Legal Operations</title>
+<style>
+:root {
+  --gold: #9A7B2E;
+  --gold-light: #C9A84C;
+  --gold-dim: #6B5420;
+  --white: #FFFFFF;
+  --light: #F9FAFB;
+  --light2: #F3F4F6;
+  --light3: #E5E7EB;
+  --charcoal: #1F2937;
+  --dark: #111827;
+  --silver: #6B7280;
+  --silver-light: #374151;
+  --blue: #1E6BFF;
+  --blue-glow: #3D8BFF;
+  --cyan: #0077B6;
+  --text-primary: #111827;
+  --text-muted: rgba(107,114,128,0.75);
+  --glass: rgba(0,0,0,0.02);
+  --glass-border: rgba(154,123,46,0.15);
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.07);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,0.08);
+  --shadow-xl: 0 24px 60px rgba(0,0,0,0.1);
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; font-size: 16px; }
+
+body {
+  background: var(--white);
+  color: var(--text-primary);
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  overflow-x: hidden;
+  cursor: none;
+}
+
+/* Custom Cursor */
+.cursor {
+  width: 8px; height: 8px;
+  background: var(--gold);
+  border-radius: 50%;
+  position: fixed; top: 0; left: 0;
+  pointer-events: none; z-index: 9999;
+  transition: transform 0.1s ease;
+}
+.cursor-ring {
+  width: 36px; height: 36px;
+  border: 1.5px solid rgba(154,123,46,0.4);
+  border-radius: 50%;
+  position: fixed; top: 0; left: 0;
+  pointer-events: none; z-index: 9998;
+  transition: all 0.15s ease;
+}
+
+/* Noise Overlay */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.02'/%3E%3C/svg%3E");
+  pointer-events: none; z-index: 1000; opacity: 0.5;
+}
+
+/* =================== NAV =================== */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 900;
+  padding: 1.2rem 4rem;
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(24px);
+  border-bottom: 1px solid rgba(154,123,46,0.08);
+}
+
+.nav-logo { display: flex; align-items: center; gap: 0.75rem; }
+.nav-logo-icon {
+  width: 36px; height: 36px;
+  border: 1.5px solid var(--gold);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: Georgia, 'Palatino Linotype', serif;
+  font-size: 1.2rem; font-weight: 700;
+  color: var(--gold);
+  position: relative;
+}
+.nav-logo-icon::before {
+  content: '';
+  position: absolute; inset: 3px;
+  border: 1px solid rgba(154,123,46,0.25);
+  border-radius: 3px;
+}
+.nav-logo-text { font-size: 0.85rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--charcoal); }
+.nav-logo-sub { font-family: 'SF Mono', 'Cascadia Code', 'Courier New', monospace; font-size: 0.6rem; color: var(--gold); letter-spacing: 0.2em; }
+
+.nav-links { display: flex; gap: 2.5rem; align-items: center; }
+.nav-links a {
+  text-decoration: none; color: var(--silver);
+  font-size: 0.78rem; font-weight: 500; letter-spacing: 0.1em;
+  text-transform: uppercase; transition: color 0.3s;
+  position: relative;
+}
+.nav-links a::after {
+  content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 1px;
+  background: var(--gold); transition: width 0.3s;
+}
+.nav-links a:hover { color: var(--gold); }
+.nav-links a:hover::after { width: 100%; }
+
+.nav-cta {
+  background: linear-gradient(135deg, var(--gold), var(--gold-dim));
+  color: var(--white) !important;
+  padding: 0.55rem 1.4rem !important;
+  border-radius: 4px;
+  font-weight: 700 !important;
+}
+.nav-cta::after { display: none !important; }
+
+/* =================== HERO =================== */
+.hero {
+  min-height: 100vh;
+  display: flex; align-items: center;
+  position: relative; overflow: hidden;
+  padding: 8rem 4rem 4rem;
+  background: var(--white);
+}
+
+.hero-grid {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(154,123,46,0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(154,123,46,0.06) 1px, transparent 1px);
+  background-size: 60px 60px;
+  animation: gridMove 20s linear infinite;
+}
+@keyframes gridMove {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(60px); }
+}
+
+.orb { position: absolute; border-radius: 50%; filter: blur(80px); pointer-events: none; }
+.orb-1 { width: 600px; height: 600px; background: radial-gradient(circle, rgba(30,107,255,0.06), transparent 70%); top: -100px; right: -100px; }
+.orb-2 { width: 400px; height: 400px; background: radial-gradient(circle, rgba(201,168,76,0.06), transparent 70%); bottom: 0; left: 10%; }
+.orb-3 { width: 300px; height: 300px; background: radial-gradient(circle, rgba(0,136,204,0.04), transparent 70%); top: 30%; left: 50%; }
+
+.hero-content { position: relative; z-index: 2; max-width: 700px; }
+
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  background: rgba(154,123,46,0.06);
+  border: 1px solid rgba(154,123,46,0.15);
+  border-radius: 100px;
+  padding: 0.4rem 1rem;
+  font-family: 'SF Mono', 'Cascadia Code', 'Courier New', monospace;
+  font-size: 0.7rem; letter-spacing: 0.15em;
+  color: var(--gold); text-transform: uppercase;
+  margin-bottom: 2rem;
+  animation: fadeUp 0.8s ease both;
+}
+.hero-eyebrow-dot { width: 6px; height: 6px; background: var(--gold); border-radius: 50%; animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+.hero-title {
+  font-family: Georgia, 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
+  font-size: clamp(3.5rem, 7vw, 6.5rem);
+  font-weight: 300;
+  line-height: 1.0;
+  letter-spacing: -0.02em;
+  margin-bottom: 1.5rem;
+  color: var(--charcoal);
+  animation: fadeUp 0.8s 0.1s ease both;
+}
+.hero-title em {
+  font-style: italic;
+  background: linear-gradient(135deg, var(--gold-light), var(--gold), var(--gold-dim));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.hero-title span { display: block; }
+
+.hero-sub {
+  font-size: 1rem; line-height: 1.8;
+  color: var(--text-muted); max-width: 520px;
+  margin-bottom: 2.5rem;
+  animation: fadeUp 0.8s 0.2s ease both;
+}
+
+.hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; animation: fadeUp 0.8s 0.3s ease both; }
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--gold), #A07830);
+  color: var(--white);
+  padding: 0.85rem 2rem;
+  border: none; border-radius: 4px;
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 0.82rem; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  cursor: none; text-decoration: none;
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  transition: all 0.3s; position: relative; overflow: hidden;
+}
+.btn-primary::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, var(--gold-light), var(--gold));
+  opacity: 0; transition: opacity 0.3s;
+}
+.btn-primary:hover::before { opacity: 1; }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(154,123,46,0.25); }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--silver-light);
+  padding: 0.85rem 2rem;
+  border: 1px solid rgba(107,114,128,0.25);
+  border-radius: 4px;
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 0.82rem; font-weight: 600;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  cursor: none; text-decoration: none;
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  transition: all 0.3s;
+}
+.btn-ghost:hover { border-color: var(--gold); color: var(--gold); transform: translateY(-2px); }
+
+.hero-visual {
+  position: absolute; right: 0; top: 0; bottom: 0; width: 50%;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1;
+}
+
+/* Floating Dashboard Widget */
+.dashboard-widget {
+  background: rgba(255,255,255,0.95);
+  border: 1px solid rgba(154,123,46,0.12);
+  border-radius: 12px;
+  padding: 1.5rem;
+  backdrop-filter: blur(20px);
+  position: absolute;
+  box-shadow: var(--shadow-xl);
+}
+.dw-main { width: 380px; top: 15%; right: 8%; animation: float1 6s ease-in-out infinite; }
+.dw-2 { width: 200px; bottom: 20%; right: 40%; animation: float2 8s ease-in-out infinite; }
+.dw-3 { width: 160px; top: 35%; right: 3%; animation: float3 7s ease-in-out infinite; }
+
+@keyframes float1 { 0%,100% { transform: translateY(0px) rotate(-1deg); } 50% { transform: translateY(-20px) rotate(0deg); } }
+@keyframes float2 { 0%,100% { transform: translateY(0px); } 50% { transform: translateY(-15px); } }
+@keyframes float3 { 0%,100% { transform: translateY(-8px); } 50% { transform: translateY(8px); } }
+
+.dw-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+.dw-title { font-size: 0.65rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--silver); }
+.dw-badge { background: rgba(0,136,204,0.08); border: 1px solid rgba(0,136,204,0.2); color: var(--cyan); font-size: 0.55rem; padding: 0.2rem 0.5rem; border-radius: 100px; font-family: 'SF Mono', 'Cascadia Code', 'Courier New', monospace; }
+
+.dw-stat-row { display: flex; gap: 1rem; margin-bottom: 1rem; }
+.dw-stat { flex: 1; }
+.dw-stat-val { font-family: Georgia, 'Palatino Linotype', serif; font-size: 1.8rem; font-weight: 700; color: var(--gold); line-height: 1; }
+.dw-stat-label { font-size: 0.6rem; color: var(--text-muted); margin-top: 0.2rem; letter-spacing: 0.08em; }
+
+.dw-bars { display: flex; align-items: flex-end; gap: 4px; height: 50px; margin-bottom: 0.8rem; }
+.dw-bar { flex: 1; border-radius: 2px 2px 0 0; transition: height 0.5s; }
+.dw-bar:nth-child(1) { height: 40%; background: rgba(154,123,46,0.2); }
+.dw-bar:nth-child(2) { height: 65%; background: rgba(154,123,46,0.3); }
+.dw-bar:nth-child(3) { height: 45%; background: rgba(154,123,46,0.2); }
+.dw-bar:nth-child(4) { height: 80%; background: rgba(154,123,46,0.45); }
+.dw-bar:nth-child(5) { height: 60%; background: rgba(154,123,46,0.3); }
+.dw-bar:nth-child(6) { height: 90%; background: var(--gold); }
+.dw-bar:nth-child(7) { height: 70%; background: rgba(154,123,46,0.35); }
+
+.dw-cases { display: flex; flex-direction: column; gap: 0.4rem; }
+.dw-case-row { display: flex; align-items: center; gap: 0.6rem; padding: 0.5rem; border-radius: 6px; background: rgba(0,0,0,0.02); }
+.dw-case-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.dw-case-dot.active { background: #059669; box-shadow: 0 0 6px rgba(5,150,105,0.5); }
+.dw-case-dot.pending { background: var(--gold); box-shadow: 0 0 6px rgba(154,123,46,0.5); }
+.dw-case-dot.review { background: var(--blue); box-shadow: 0 0 6px rgba(30,107,255,0.5); }
+.dw-case-text { font-size: 0.62rem; color: var(--charcoal); flex: 1; }
+.dw-case-count { font-family: 'SF Mono', 'Cascadia Code', 'Courier New', monospace; font-size: 0.62rem; color: var(--text-muted); }
+
+.dw-mini { padding: 1rem; }
+.dw-mini .dw-stat-val { font-size: 1.4rem; }
+.dw-ai-ring { width: 60px; height: 60px; border-radius: 50%; border: 2px solid rgba(0,136,204,0.25); display: flex; align-items: center; justify-content: center; margin: 0.5rem auto; position: relative; }
+.dw-ai-ring::before { content: ''; position: absolute; inset: 4px; border-radius: 50%; border: 1px solid rgba(0,136,204,0.15); animation: spin 4s linear infinite; border-top-color: var(--cyan); }
+@keyframes spin { to { transform: rotate(360deg); } }
+.dw-ai-ring-inner { font-size: 0.55rem; text-align: center; color: var(--cyan); font-family: 'SF Mono', 'Cascadia Code', 'Courier New', monospace; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.scroll-indicator {
+  position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+  color: var(--text-muted); font-size: 0.65rem; letter-spacing: 0.15em;
+  text-transform: uppercase; font-family: 'SF Mono', 'Cascadia Code', 'Courier New', monospace;
+  animation: fadeUp 1s 1s ease both;
+}
+.scroll-line { width: 1px; height: 40px; background: linear-gradient(to bottom, var(--gold), transparent); animation: scrollAnim 2s infinite; }
+@keyframes scrollAnim { 0%,100% { opacity: 0; transform: scaleY(0) translateY(-100%); } 50% { opacity: 1; transform: scaleY(1) translateY(0); } }
+
+/* =================== SECTION BASE =================== */
+section { padding: 7rem 4rem; position: relative; }
+.section-label {
+  font-family: 'SF Mono', 'Cascadia Code', 'Courier New', monospace;
+  font-size: 0.68rem; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--gold);
+  margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 0.75rem;
+}
+.section-label::before { content: ''; width: 24px; height: 1px; background: var(--gold); }
+.section-title {
+  font-family: Georgia, 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 300; line-height: 1.1;
+  margin-bottom: 1.5rem; color: var(--charcoal);
+}
+.section-title em { font-style: italic; color: var(--gold); }
+.section-sub { color: var(--text-muted); line-height: 1.8; max-width: 560px; font-size: 0.95rem; }
+
+/* =================== STATS BAR =================== */
+.stats-bar {
+  background: var(--light);
+  border-top: 1px solid rgba(154,123,46,0.08);
+  border-bottom: 1px solid rgba(154,123,46,0.08);
+  padding: 2.5rem 4rem;
+  display: flex; justify-content: space-around;
+  flex-wrap: wrap; gap: 2rem;
+}
+.stat-item { text-align: center; }
+.stat-num {
+  font-family: Georgia, 'Palatino Linotype', serif;
+  font-size: 3rem; font-weight: 700;
+  background: linear-gradient(135deg, var(--gold-light), var(--gold));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  line-height: 1;
+}
+.stat-label { font-size: 0.72rem; color: var(--text-muted); letter-spacing: 0.1em; margin-top: 0.4rem; text-transform: uppercase; }
+
+/* =================== ABOUT =================== */
+.about { background: var(--light); }
+.about-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 6rem; align-items: center; }
+.about-visual { position: relative; }
+.founder-card {
+  background: var(--white);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 2.5rem;
+  position: relative; overflow: hidden;
+  box-shadow: var(--shadow-lg);
+}
+.founder-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+.founder-avatar {
+  width: 100px; height: 100px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--light2), var(--light3));
+  border: 2px solid rgba(154,123,46,0.25);
+  margin-bottom: 1.5rem;
+  display: flex; align-items: center; justify-content: center;
+  font-family: Georgia, 'Palatino Linotype', serif;
+  font-size: 2.5rem; color: var(--gold); font-weight: 700;
+}
+.founder-name { font-family: Georgia, 'Palatino Linotype', serif; font-size: 1.8rem; margin-bottom: 0.3rem; color: var(--charcoal); }
+.founder-title { font-size: 0.7rem; color: var(--gold); letter-spacing: 0.12em; text-transform: uppercase; font-family: 'SF Mono', 'Cascadia Code', 'Courier New', monospace; margin-bottom: 1.2rem; }
+.founder-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.tag {
+  border: 1px solid rgba(154,123,46,0.18);
+  border-radius: 100px; padding: 0.3rem 0.8rem;
+  font-size: 0.65rem; color: var(--silver-light); letter-spacing: 0.08em;
+  background: rgba(154,123,46,0.03);
+}
+.about-vision {
+  font-family: Georgia, 'Palatino Linotype', serif;
+  font-size: 1.5rem; font-style: italic;
+  line-height: 1.5; color: var(--silver-light);
+  border-left: 2px solid var(--gold);
+  padding-left: 1.5rem; margin-top: 2rem;
+}
+
+/* =================== SERVICES =================== */
+.services { background: var(--white); }
+.services-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 4rem; }
+.service-card {
+  background: var(--white);
+  border: 1px solid rgba(0,0,0,0.06);
+  padding: 2.5rem;
+  transition: all 0.3s;
+  position: relative; overflow: hidden;
+  cursor: none; border-radius: 12px;
+}
+.service-card:hover { box-shadow: var(--shadow-lg); border-color: rgba(154,123,46,0.15); transform: translateY(-4px); }
+.service-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  opacity: 0; transition: opacity 0.3s;
+}
+.service-card:hover::before { opacity: 1; }
+.service-num { font-family: 'SF Mono', 'Cascadia Code', 'Courier New', monospace; font-size: 0.65rem; color: var(--gold-dim); margin-bottom: 1.5rem; }
+.service-icon { font-size: 2rem; margin-bottom: 1rem; }
+.service-title { font-family: Georgia, 'Palatino Linotype', serif; font-size: 1.5rem; margin-bottom: 0.8rem; color: var(--charcoal); }
+.service-desc { font-size: 0.82rem; color: var(--text-muted); line-height: 1.7; margin-bottom: 1.2rem; }
+.service-features { list-style: none; }
+.service-features li { font-size: 0.75rem; color: var(--silver-light); padding: 0.25rem 0; padding-left: 1rem; position: relative; }
+.service-features li::before { content: '—'; position: absolute; left: 0; color: var(--gold-dim); }
+
+/* =================== AI FEATURES =================== */
+.ai-features { background: var(--light); overflow: hidden; }
+.ai-features-inner { display: grid; grid-template-columns: 1fr 1.2fr; gap: 5rem; align-items: start; }
+.ai-cards { display: flex; flex-direction: column; gap: 1rem; }
+.ai-card {
+  background: var(--white);
+  border: 1px solid rgba(0,0,0,0.06);
+  border-radius: 10px; padding: 1.5rem 1.8rem;
+  display: flex; gap: 1.2rem; align-items: flex-start;
+  cursor: none; transition: all 0.3s;
+  position: relative; overflow: hidden;
+}
+.ai-card:hover { border-color: rgba(154,123,46,0.2); transform: translateX(6px); box-shadow: var(--shadow-md); }
+.ai-card-icon {
+  width: 44px; height: 44px; border-radius: 8px;
+  background: rgba(154,123,46,0.06);
+  border: 1px solid rgba(154,123,46,0.12);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem; flex-shrink: 0;
+}
+.ai-card-title { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.3rem; color: var(--charcoal); }
+.ai-card-desc { font-size: 0.78rem; color: var(--text-muted); line-height: 1.6; }
+
+.ai-terminal {
+  background: #0F1218;
+  border: 1px solid rgba(154,123,46,0.12);
+  border-radius: 12px; overflow: hidden;
+  box-shadow: var(--shadow-xl);
+  position: sticky; top: 8rem;
+}
+.terminal-bar {
+  background: rgba(154,123,46,0.06);
+  padding: 0.75rem 1rem;
+  display: flex; align-items: center; gap: 0.5rem;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.t-dot { width: 10px; height: 10px; border-radius: 50%; }
+.t-dot:nth-child(1) { background: #FF5F57; }
+.t-dot:nth-child(2) { background: #FFBD2E; }
+.t-dot:nth-child(3) { background: #28CA41; }
+.terminal-title { font-family: 'SF Mono', 'Cascadia Code', 'Courier New', monospace; font-size: 0.65rem; color: #6B7280; margin-left: auto; }
+.terminal-body { padding: 1.5rem; font-family: 'SF Mono', 'Cascadia Code', 'Courier New', monospace; font-size: 0.75rem; color: #A8B4C0; }
+.t-line { padding: 0.2rem 0; display: flex; gap: 0.5rem; }
+.t-prompt { color: var(--gold-light); }
+.t-cmd { color: #00D4FF; }
+.t-out { color: rgba(168,180,192,0.8); padding-left: 1rem; }
+.t-out.success { color: #00C897; }
+.t-out.highlight { color: var(--gold-light); }
+.t-cursor { display: inline-block; width: 8px; height: 14px; background: #00D4FF; animation: blink 1s infinite; vertical-align: middle; }
+@keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+
+/* =================== INDUSTRIES =================== */
+.industries { background: var(--white); }
+.industries-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; margin-top: 4rem; }
+.industry-card {
+  background: var(--light);
+  border: 1px solid rgba(0,0,0,0.05);
+  border-radius: 10px; padding: 1.8rem 1.2rem;
+  text-align: center; cursor: none; transition: all 0.3s;
+  position: relative; overflow: hidden;
+}
+.industry-card::after {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  transform: scaleX(0); transition: transform 0.3s;
+}
+.industry-card:hover { border-color: rgba(154,123,46,0.2); transform: translateY(-6px); box-shadow: var(--shadow-md); }
+.industry-card:hover::after { transform: scaleX(1); }
+.industry-icon { font-size: 2rem; margin-bottom: 0.8rem; display: block; }
+.industry-name { font-size: 0.8rem; font-weight: 600; letter-spacing: 0.06em; color: var(--charcoal); }
+
+/* =================== PRICING =================== */
+.pricing { background: var(--light); }
+.pricing-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-top: 4rem; }
+.price-card {
+  background: var(--white);
+  border: 1px solid rgba(0,0,0,0.06);
+  border-radius: 12px; padding: 2rem;
+  position: relative; transition: all 0.4s;
+  cursor: none; overflow: hidden;
+}
+.price-card:hover { transform: translateY(-8px); border-color: rgba(154,123,46,0.2); box-shadow: var(--shadow-xl); }
+.price-card.featured {
+  border-color: var(--gold);
+  background: linear-gradient(135deg, rgba(154,123,46,0.03), var(--white));
+  box-shadow: 0 8px 40px rgba(154,123,46,0.1);
+}
+.price-card.featured::before {
+  content: 'MOST POPULAR';
+  position: absolute; top: 1rem; right: 1rem;
+  background: var(--gold); color: var(--white);
+  font-size: 0.55rem; font-weight: 800; letter-spacing: 0.12em;
+  padding: 0.25rem 0.6rem; border-radius: 100px;
+}
+.price-tier { font-family: 'SF Mono', 'Cascadia Code', 'Courier New', monospace; font-size: 0.65rem; color: var(--gold); letter-spacing: 0.15em; margin-bottom: 0.5rem; }
+.price-name { font-family: Georgia, 'Palatino Linotype', serif; font-size: 1.5rem; margin-bottom: 0.3rem; color: var(--charcoal); }
+.price-for { font-size: 0.72rem; color: var(--text-muted); margin-bottom: 1.5rem; }
+.price-amount { margin-bottom: 1.5rem; }
+.price-currency { font-size: 1rem; color: var(--gold); vertical-align: top; line-height: 2.5; }
+.price-num {
+  font-family: Georgia, 'Palatino Linotype', serif;
+  font-size: 2.8rem; font-weight: 700; color: var(--charcoal);
+  line-height: 1;
+}
+.price-period { font-size: 0.72rem; color: var(--text-muted); }
+.price-divider { height: 1px; background: rgba(0,0,0,0.06); margin-bottom: 1.5rem; }
+.price-features { list-style: none; margin-bottom: 2rem; }
+.price-features li { font-size: 0.78rem; color: var(--silver-light); padding: 0.4rem 0; display: flex; align-items: flex-start; gap: 0.5rem; }
+.price-features li::before { content: '✓'; color: var(--gold); flex-shrink: 0; margin-top: 0.05rem; }
+.price-cta {
+  width: 100%; padding: 0.85rem;
+  border: 1px solid rgba(154,123,46,0.25);
+  background: transparent; color: var(--gold);
+  border-radius: 6px; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 0.78rem; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; cursor: none; transition: all 0.3s;
+}
+.price-cta:hover, .price-card.featured .price-cta {
+  background: var(--gold); color: var(--white); border-color: var(--gold);
+}
+
+/* =================== SECURITY =================== */
+.security { background: var(--white); }
+.security-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 6rem; align-items: center; }
+.security-badges { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+.sec-badge {
+  background: var(--light);
+  border: 1px solid rgba(0,0,0,0.05);
+  border-radius: 10px; padding: 1.5rem;
+  transition: all 0.3s;
+}
+.sec-badge:hover { border-color: rgba(154,123,46,0.2); box-shadow: var(--shadow-sm); }
+.sec-badge-icon { font-size: 1.8rem; margin-bottom: 0.8rem; }
+.sec-badge-title { font-size: 0.85rem; font-weight: 600; margin-bottom: 0.3rem; color: var(--charcoal); }
+.sec-badge-desc { font-size: 0.72rem; color: var(--text-muted); line-height: 1.6; }
+
+/* =================== TESTIMONIALS =================== */
+.testimonials { background: var(--light); overflow: hidden; }
+.testi-track { display: flex; gap: 1.5rem; width: max-content; animation: scroll 30s linear infinite; }
+.testi-track:hover { animation-play-state: paused; }
+.testi-card {
+  background: var(--white);
+  border: 1px solid rgba(0,0,0,0.05);
+  border-radius: 12px; padding: 2rem;
+  width: 340px; flex-shrink: 0;
+  box-shadow: var(--shadow-sm);
+}
+.testi-stars { color: var(--gold); font-size: 0.9rem; margin-bottom: 1rem; letter-spacing: 0.1em; }
+.testi-text { font-family: Georgia, 'Palatino Linotype', serif; font-size: 1.1rem; font-style: italic; line-height: 1.6; margin-bottom: 1.5rem; color: var(--silver-light); }
+.testi-author { display: flex; align-items: center; gap: 0.75rem; }
+.testi-avatar { width: 36px; height: 36px; border-radius: 50%; background: rgba(154,123,46,0.08); border: 1px solid rgba(154,123,46,0.15); display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; color: var(--gold); }
+.testi-name { font-size: 0.82rem; font-weight: 600; color: var(--charcoal); }
+.testi-role { font-size: 0.68rem; color: var(--text-muted); }
+
+@keyframes scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+/* =================== VISION =================== */
+.vision {
+  background: var(--charcoal);
+  text-align: center;
+  padding: 8rem 4rem;
+  position: relative; overflow: hidden;
+  color: #F0F4F8;
+}
+.vision::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 80% 60% at 50% 50%, rgba(30,107,255,0.08), transparent);
+}
+.vision-headline {
+  font-family: Georgia, 'Palatino Linotype', serif;
+  font-size: clamp(2.5rem, 6vw, 5rem);
+  font-weight: 300; line-height: 1.1;
+  max-width: 800px; margin: 0 auto 2rem;
+  color: #F0F4F8;
+}
+.vision-headline em { font-style: italic; color: var(--gold-light); }
+.vision-sub { color: rgba(168,180,192,0.7); max-width: 500px; margin: 0 auto 3rem; line-height: 1.8; }
+.vision-grid { display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap; margin-top: 3rem; }
+.vision-item { text-align: center; }
+.vision-item-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+.vision-item-label { font-size: 0.72rem; color: #A8B4C0; letter-spacing: 0.1em; }
+
+/* =================== CONTACT =================== */
+.contact { background: var(--white); }
+.contact-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 6rem; }
+.contact-form { display: flex; flex-direction: column; gap: 1rem; }
+.form-group { display: flex; flex-direction: column; gap: 0.4rem; }
+.form-label { font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--silver); }
+.form-input, .form-select, .form-textarea {
+  background: var(--light);
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 6px;
+  padding: 0.85rem 1rem;
+  color: var(--text-primary);
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; font-size: 0.9rem;
+  transition: border-color 0.3s; outline: none;
+  cursor: none;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus { border-color: rgba(154,123,46,0.4); box-shadow: 0 0 0 3px rgba(154,123,46,0.06); }
+.form-textarea { height: 120px; resize: vertical; }
+.form-select { appearance: none; }
+.contact-info { display: flex; flex-direction: column; gap: 2rem; }
+.contact-item { display: flex; gap: 1rem; align-items: flex-start; }
+.contact-icon { width: 44px; height: 44px; border-radius: 8px; background: rgba(154,123,46,0.06); border: 1px solid rgba(154,123,46,0.12); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
+.contact-detail-label { font-size: 0.7rem; color: var(--gold); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.3rem; }
+.contact-detail-val { font-size: 0.92rem; color: var(--charcoal); }
+
+/* =================== FOOTER =================== */
+footer {
+  background: var(--charcoal);
+  border-top: 1px solid rgba(154,123,46,0.1);
+  padding: 4rem; color: #A8B4C0;
+}
+.footer-inner { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 3rem; margin-bottom: 3rem; }
+.footer-logo { font-family: Georgia, 'Palatino Linotype', serif; font-size: 1.4rem; margin-bottom: 0.5rem; color: #F0F4F8; }
+.footer-tagline { font-size: 0.75rem; color: rgba(168,180,192,0.7); line-height: 1.6; max-width: 280px; }
+.footer-col-title { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold-light); margin-bottom: 1.2rem; }
+.footer-links { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; }
+.footer-links a { text-decoration: none; color: rgba(168,180,192,0.7); font-size: 0.82rem; transition: color 0.3s; }
+.footer-links a:hover { color: var(--gold-light); }
+.footer-bottom { border-top: 1px solid rgba(255,255,255,0.06); padding-top: 2rem; display: flex; justify-content: space-between; align-items: center; }
+.footer-copy { font-size: 0.72rem; color: rgba(168,180,192,0.5); }
+.footer-legal { display: flex; gap: 1.5rem; }
+.footer-legal a { font-size: 0.72rem; color: rgba(168,180,192,0.5); text-decoration: none; transition: color 0.3s; }
+.footer-legal a:hover { color: var(--gold-light); }
+
+/* =================== PRICING ADDONS =================== */
+.addons { background: var(--light); }
+.addons-table { width: 100%; border-collapse: collapse; margin-top: 3rem; background: var(--white); border-radius: 12px; overflow: hidden; border: 1px solid rgba(0,0,0,0.06); }
+.addons-table th { text-align: left; padding: 1rem 1.2rem; font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold); border-bottom: 1px solid rgba(0,0,0,0.06); background: var(--light); }
+.addons-table td { padding: 1rem 1.2rem; font-size: 0.85rem; border-bottom: 1px solid rgba(0,0,0,0.04); color: var(--silver-light); transition: background 0.2s; }
+.addons-table tr:hover td { background: rgba(154,123,46,0.02); }
+.addons-table .price-col { font-family: 'SF Mono', 'Cascadia Code', 'Courier New', monospace; color: var(--gold); font-size: 0.85rem; }
+
+/* Animations */
+.reveal { opacity: 0; transform: translateY(40px); transition: opacity 0.7s ease, transform 0.7s ease; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* Responsive */
+@media (max-width: 1100px) {
+  .pricing-grid { grid-template-columns: repeat(2, 1fr); }
+  .industries-grid { grid-template-columns: repeat(4, 1fr); }
+  .footer-inner { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 768px) {
+  nav { padding: 1rem 1.5rem; }
+  .nav-links { display: none; }
+  section { padding: 5rem 1.5rem; }
+  .hero { padding: 7rem 1.5rem 4rem; }
+  .hero-visual { display: none; }
+  .about-inner, .ai-features-inner, .security-inner, .contact-inner { grid-template-columns: 1fr; gap: 3rem; }
+  .services-grid { grid-template-columns: 1fr; }
+  .pricing-grid { grid-template-columns: 1fr; }
+  .industries-grid { grid-template-columns: repeat(2, 1fr); }
+  .footer-inner { grid-template-columns: 1fr; }
+  .stats-bar { padding: 2rem 1.5rem; }
+}
+
+/* Tag styles in footer */
+.footer-tags { margin-top: 1.5rem; display: flex; gap: 0.75rem; flex-wrap: wrap; }
+.footer-tag {
+  border: 1px solid rgba(154,123,46,0.2);
+  border-radius: 100px; padding: 0.3rem 0.8rem;
+  font-size: 0.65rem; color: var(--gold-light); letter-spacing: 0.08em;
+  background: rgba(154,123,46,0.06);
+}
+</style>
+</head>
+<body>
+
+<!-- Cursor -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">
+    <div class="nav-logo-icon">W</div>
+    <div>
+      <div class="nav-logo-text">DLO</div>
+      <div class="nav-logo-sub">Digital Law Office</div>
+    </div>
+  </div>
+  <div class="nav-links">
+    <a href="#about">About</a>
+    <a href="#services">Services</a>
+    <a href="#ai">AI Engine</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#contact">Contact</a>
+    <a href="#contact" class="nav-cta">Book Demo</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-grid"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <div class="hero-content">
+    <div class="hero-eyebrow">
+      <span class="hero-eyebrow-dot"></span>
+      India's Most Advanced AI LegalTech Platform
+    </div>
+    <h1 class="hero-title">
+      <span>The Future of</span>
+      <em>AI-Powered</em>
+      <span>Legal Operations</span>
+    </h1>
+    <p class="hero-sub">Warrior's Digital Law Office centralises litigation, compliance, legal workflows, AI drafting, analytics, governance, and enterprise legal operations into one intelligent ecosystem.</p>
+    <div class="hero-actions">
+      <a href="#contact" class="btn-primary">Start Free Trial →</a>
+      <a href="#contact" class="btn-ghost">Book Enterprise Demo</a>
+      <a href="#services" class="btn-ghost">Explore AI Features</a>
+    </div>
+  </div>
+
+  <!-- Floating Widgets -->
+  <div class="hero-visual">
+    <div class="dashboard-widget dw-main">
+      <div class="dw-header">
+        <span class="dw-title">Litigation Analytics</span>
+        <span class="dw-badge">● LIVE</span>
+      </div>
+      <div class="dw-stat-row">
+        <div class="dw-stat"><div class="dw-stat-val">2,847</div><div class="dw-stat-label">Active Cases</div></div>
+        <div class="dw-stat"><div class="dw-stat-val">94%</div><div class="dw-stat-label">Win Rate</div></div>
+        <div class="dw-stat"><div class="dw-stat-val">12.4d</div><div class="dw-stat-label">Avg TAT</div></div>
+      </div>
+      <div class="dw-bars">
+        <div class="dw-bar"></div><div class="dw-bar"></div><div class="dw-bar"></div>
+        <div class="dw-bar"></div><div class="dw-bar"></div><div class="dw-bar"></div>
+        <div class="dw-bar"></div>
+      </div>
+      <div class="dw-cases">
+        <div class="dw-case-row"><div class="dw-case-dot active"></div><span class="dw-case-text">High Court — Mumbai</span><span class="dw-case-count">847</span></div>
+        <div class="dw-case-row"><div class="dw-case-dot pending"></div><span class="dw-case-text">District Court — Pune</span><span class="dw-case-count">1,203</span></div>
+        <div class="dw-case-row"><div class="dw-case-dot review"></div><span class="dw-case-text">Supreme Court — Delhi</span><span class="dw-case-count">124</span></div>
+      </div>
+    </div>
+
+    <div class="dashboard-widget dw-2">
+      <div class="dw-header">
+        <span class="dw-title">AI Drafting</span>
+      </div>
+      <div class="dw-stat"><div class="dw-stat-val" style="font-size:1.4rem">1,249</div><div class="dw-stat-label">Documents Generated</div></div>
+      <div style="height:4px;background:rgba(0,0,0,0.06);border-radius:2px;margin-top:1rem"><div style="width:82%;height:100%;background:var(--gold);border-radius:2px"></div></div>
+      <div style="font-size:0.6rem;color:var(--text-muted);margin-top:0.4rem;font-family:'SF Mono','Cascadia Code','Courier New',monospace">82% efficiency gain</div>
+    </div>
+
+    <div class="dashboard-widget dw-3 dw-mini">
+      <div class="dw-ai-ring"><div class="dw-ai-ring-inner">SAYA<br>AI</div></div>
+      <div style="text-align:center">
+        <div class="dw-stat-val" style="font-size:1.2rem;text-align:center">Active</div>
+        <div class="dw-stat-label">Legal Engine</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="scroll-indicator">
+    <span>Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- STATS BAR -->
+<div class="stats-bar reveal">
+  <div class="stat-item"><div class="stat-num">10,000+</div><div class="stat-label">Cases Managed</div></div>
+  <div class="stat-item"><div class="stat-num">500+</div><div class="stat-label">Enterprise Clients</div></div>
+  <div class="stat-item"><div class="stat-num">94%</div><div class="stat-label">Client Satisfaction</div></div>
+  <div class="stat-item"><div class="stat-num">24/7</div><div class="stat-label">AI Legal Engine</div></div>
+  <div class="stat-item"><div class="stat-num">₹2.5Cr+</div><div class="stat-label">Legal Value Processed</div></div>
+</div>
+
+<!-- ABOUT -->
+<section class="about" id="about">
+  <div class="about-inner">
+    <div class="about-visual reveal">
+      <div class="founder-card">
+        <div class="founder-avatar">W</div>
+        <div class="founder-name">Warrior</div>
+        <div class="founder-title">BSL · Founder & AI Legal Architect</div>
+        <div class="founder-tags">
+          <span class="tag">LegalTech Innovator</span>
+          <span class="tag">AI Systems Architect</span>
+          <span class="tag">Enterprise Legal Visionary</span>
+          <span class="tag">Digital Law Pioneer</span>
+        </div>
+        <p class="about-vision">"To transform legal operations through AI, automation, governance, analytics, and intelligent digital infrastructure."</p>
+      </div>
+    </div>
+    <div class="reveal">
+      <div class="section-label">About the Founder</div>
+      <h2 class="section-title">Architecting the <em>Digital</em><br>Future of Law</h2>
+      <p class="section-sub">Warrior's Digital Law Office is India's most advanced AI-powered legal operations ecosystem — built by a practising lawyer who understood that the legal industry's greatest inefficiency was its resistance to intelligent automation.</p>
+      <br>
+      <p class="section-sub" style="margin-top:1rem">With a deep foundation in law and a visionary approach to technology, this platform bridges the gap between complex legal workflows and enterprise-grade AI infrastructure — empowering advocates, corporations, banks, and governments to operate at the speed of intelligence.</p>
+      <div style="display:flex;gap:1.5rem;margin-top:2.5rem;flex-wrap:wrap">
+        <a href="#contact" class="btn-primary">Schedule Consultation →</a>
+        <a href="#ai" class="btn-ghost">Explore AI Engine</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section class="services" id="services">
+  <div class="reveal">
+    <div class="section-label">Solutions</div>
+    <h2 class="section-title">Complete <em>Legal Intelligence</em><br>Ecosystem</h2>
+  </div>
+  <div class="services-grid">
+    <div class="service-card reveal">
+      <div class="service-num">01</div>
+      <div class="service-icon">⚖️</div>
+      <div class="service-title">AI Case Management</div>
+      <div class="service-desc">Centralised litigation command centre with real-time tracking, workflow automation, and intelligent case lifecycle monitoring.</div>
+      <ul class="service-features">
+        <li>Centralised litigation management</li>
+        <li>Automated hearing tracking</li>
+        <li>Legal workflow automation</li>
+        <li>Case lifecycle monitoring</li>
+      </ul>
+    </div>
+    <div class="service-card reveal">
+      <div class="service-num">02</div>
+      <div class="service-icon">📝</div>
+      <div class="service-title">AI Drafting Assistant</div>
+      <div class="service-desc">Generate enterprise-grade legal documents in seconds — notices, contracts, affidavits, NDAs with intelligent clause recommendations.</div>
+      <ul class="service-features">
+        <li>Legal notice drafting</li>
+        <li>Contract drafting & review</li>
+        <li>AI-powered summarisation</li>
+        <li>Smart clause recommendations</li>
+      </ul>
+    </div>
+    <div class="service-card reveal">
+      <div class="service-num">03</div>
+      <div class="service-icon">🏛️</div>
+      <div class="service-title">Enterprise Legal Governance</div>
+      <div class="service-desc">Full-spectrum compliance monitoring, audit trails, risk analytics, and legal spend intelligence for enterprise operations.</div>
+      <ul class="service-features">
+        <li>Immutable audit trails</li>
+        <li>Risk monitoring dashboards</li>
+        <li>Compliance automation</li>
+        <li>Legal spend analytics</li>
+      </ul>
+    </div>
+    <div class="service-card reveal">
+      <div class="service-num">04</div>
+      <div class="service-icon">🔍</div>
+      <div class="service-title">AI Legal Research</div>
+      <div class="service-desc">Deep legal intelligence with smart search across Supreme Court, High Courts, and legislative databases in multiple languages.</div>
+      <ul class="service-features">
+        <li>Smart legal search engine</li>
+        <li>Court case discovery</li>
+        <li>AI legal Q&A system</li>
+        <li>Multilingual legal intelligence</li>
+      </ul>
+    </div>
+    <div class="service-card reveal">
+      <div class="service-num">05</div>
+      <div class="service-icon">🤝</div>
+      <div class="service-title">Legal Collaboration System</div>
+      <div class="service-desc">End-to-end secure communication, video conferencing, advocate coordination, and client collaboration workflows.</div>
+      <ul class="service-features">
+        <li>Secure communication channels</li>
+        <li>Video conferencing</li>
+        <li>Advocate coordination</li>
+        <li>Client collaboration portal</li>
+      </ul>
+    </div>
+    <div class="service-card reveal">
+      <div class="service-num">06</div>
+      <div class="service-icon">💰</div>
+      <div class="service-title">Automated Billing System</div>
+      <div class="service-desc">Intelligent legal finance management with automated invoicing, e-signature workflows, and complete payment monitoring.</div>
+      <ul class="service-features">
+        <li>Auto invoice generation</li>
+        <li>Legal finance tracking</li>
+        <li>E-signature workflows</li>
+        <li>Payment monitoring</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- AI FEATURES -->
+<section class="ai-features" id="ai">
+  <div class="ai-features-inner">
+    <div>
+      <div class="section-label">Saya AI Engine</div>
+      <h2 class="section-title reveal"><em>Intelligent</em><br>Legal AI Modules</h2>
+      <p class="section-sub reveal">The Saya AI Legal Engine powers every interaction — from predictive litigation analytics to multilingual document processing — built natively for Indian legal infrastructure.</p>
+      <div class="ai-cards" style="margin-top:2.5rem">
+        <div class="ai-card reveal">
+          <div class="ai-card-icon">🧠</div>
+          <div><div class="ai-card-title">Saya AI Legal Engine</div><div class="ai-card-desc">Document intelligence, predictive analytics, litigation insights, and smart legal recommendations powered by specialised legal LLMs.</div></div>
+        </div>
+        <div class="ai-card reveal">
+          <div class="ai-card-icon">📊</div>
+          <div><div class="ai-card-title">Smart Legal Analytics</div><div class="ai-card-desc">Performance scorecards, case movement analytics, TAT monitoring, and enterprise-level governance dashboards.</div></div>
+        </div>
+        <div class="ai-card reveal">
+          <div class="ai-card-icon">🛡️</div>
+          <div><div class="ai-card-title">AI Compliance Monitoring</div><div class="ai-card-desc">Governance alerts, regulatory workflow monitoring, legal risk analysis, and automated compliance systems.</div></div>
+        </div>
+        <div class="ai-card reveal">
+          <div class="ai-card-icon">🌐</div>
+          <div><div class="ai-card-title">AI Translation Engine</div><div class="ai-card-desc">Multilingual legal document translation, regional language support, and voice-to-text legal transcription.</div></div>
+        </div>
+        <div class="ai-card reveal">
+          <div class="ai-card-icon">⚡</div>
+          <div><div class="ai-card-title">AI Litigation Prediction</div><div class="ai-card-desc">Predictive case outcome modelling using historical court data, judge analytics, and precedent intelligence.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ai-terminal reveal">
+      <div class="terminal-bar">
+        <div class="t-dot"></div><div class="t-dot"></div><div class="t-dot"></div>
+        <span class="terminal-title">saya-ai-engine v4.2.1</span>
+      </div>
+      <div class="terminal-body">
+        <div class="t-line"><span class="t-prompt">$</span><span class="t-cmd"> saya analyze --case HC/2024/12847</span></div>
+        <div class="t-line"><span class="t-out">→ Loading case documents... 247 pages</span></div>
+        <div class="t-line"><span class="t-out">→ Extracting legal entities...</span></div>
+        <div class="t-line"><span class="t-out success">✓ Parties identified: 3 respondents, 1 petitioner</span></div>
+        <div class="t-line"><span class="t-out success">✓ Precedents found: 18 relevant judgments</span></div>
+        <br>
+        <div class="t-line"><span class="t-prompt">$</span><span class="t-cmd"> saya predict --outcome</span></div>
+        <div class="t-line"><span class="t-out">→ Running litigation prediction model...</span></div>
+        <div class="t-line"><span class="t-out highlight">⟡ Win probability: 87.3%</span></div>
+        <div class="t-line"><span class="t-out highlight">⟡ Est. resolution: 4-6 months</span></div>
+        <div class="t-line"><span class="t-out highlight">⟡ Recommended strategy: Interim relief</span></div>
+        <br>
+        <div class="t-line"><span class="t-prompt">$</span><span class="t-cmd"> saya draft --notice --type legal</span></div>
+        <div class="t-line"><span class="t-out">→ Generating legal notice...</span></div>
+        <div class="t-line"><span class="t-out success">✓ Draft ready in 3.2 seconds</span></div>
+        <div class="t-line"><span class="t-out success">✓ Compliance check: Passed</span></div>
+        <div class="t-line"><span class="t-out success">✓ Risk score: Low (0.12)</span></div>
+        <br>
+        <div class="t-line"><span class="t-prompt">$</span><span class="t-cmd"> <span class="t-cursor"></span></span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- INDUSTRIES -->
+<section class="industries" id="industries">
+  <div class="reveal" style="text-align:center;margin-bottom:1rem">
+    <div class="section-label" style="justify-content:center">Industries Served</div>
+    <h2 class="section-title" style="text-align:center">Built for <em>Every</em><br>Enterprise Vertical</h2>
+  </div>
+  <div class="industries-grid">
+    <div class="industry-card reveal"><span class="industry-icon">🏦</span><div class="industry-name">Banks</div></div>
+    <div class="industry-card reveal"><span class="industry-icon">💳</span><div class="industry-name">NBFCs</div></div>
+    <div class="industry-card reveal"><span class="industry-icon">🛡️</span><div class="industry-name">Insurance</div></div>
+    <div class="industry-card reveal"><span class="industry-icon">🎓</span><div class="industry-name">Universities</div></div>
+    <div class="industry-card reveal"><span class="industry-icon">🏛️</span><div class="industry-name">Government</div></div>
+    <div class="industry-card reveal"><span class="industry-icon">🏢</span><div class="industry-name">Corporates</div></div>
+    <div class="industry-card reveal"><span class="industry-icon">⚖️</span><div class="industry-name">Law Firms</div></div>
+    <div class="industry-card reveal"><span class="industry-icon">📋</span><div class="industry-name">Legal Depts</div></div>
+    <div class="industry-card reveal"><span class="industry-icon">🚀</span><div class="industry-name">Startups</div></div>
+    <div class="industry-card reveal"><span class="industry-icon">🌐</span><div class="industry-name">Public Sector</div></div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing" id="pricing">
+  <div class="reveal" style="text-align:center">
+    <div class="section-label" style="justify-content:center">Pricing</div>
+    <h2 class="section-title" style="text-align:center">Transparent <em>Enterprise</em> Pricing</h2>
+    <p class="section-sub" style="max-width:500px;margin:0 auto">From individual advocates to national legal ecosystems — a plan engineered for every scale of operation.</p>
+  </div>
+  <div class="pricing-grid">
+    <div class="price-card reveal">
+      <div class="price-tier">Starter</div>
+      <div class="price-name">Starter Legal</div>
+      <div class="price-for">Individual advocates & small offices</div>
+      <div class="price-amount"><span class="price-currency">₹</span><span class="price-num">9,999</span><span class="price-period">/month</span></div>
+      <div class="price-divider"></div>
+      <ul class="price-features">
+        <li>Case management dashboard</li>
+        <li>Hearing calendar</li>
+        <li>Client management system</li>
+        <li>AI legal drafting</li>
+        <li>Basic AI legal assistant</li>
+        <li>Invoice management</li>
+        <li>5 GB secure storage</li>
+        <li>Mobile app access</li>
+      </ul>
+      <button class="price-cta">Start Your Journey</button>
+    </div>
+    <div class="price-card reveal">
+      <div class="price-tier">Professional</div>
+      <div class="price-name">Professional</div>
+      <div class="price-for">Law firms & legal teams</div>
+      <div class="price-amount"><span class="price-currency">₹</span><span class="price-num">49,999</span><span class="price-period">/month</span></div>
+      <div class="price-divider"></div>
+      <ul class="price-features">
+        <li>Multi-user legal dashboard</li>
+        <li>Advanced AI legal drafting</li>
+        <li>AI legal research system</li>
+        <li>Smart hearing automation</li>
+        <li>Video collaboration tools</li>
+        <li>Billing automation</li>
+        <li>100 GB encrypted storage</li>
+        <li>Advanced analytics dashboard</li>
+        <li>Performance scorecards</li>
+      </ul>
+      <button class="price-cta">Scale Operations</button>
+    </div>
+    <div class="price-card featured reveal">
+      <div class="price-tier">Enterprise</div>
+      <div class="price-name">Enterprise</div>
+      <div class="price-for">Banks, NBFCs, Insurance, Universities</div>
+      <div class="price-amount"><span class="price-currency">₹</span><span class="price-num">2,99,999</span><span class="price-period">/month</span></div>
+      <div class="price-divider"></div>
+      <ul class="price-features">
+        <li>Enterprise litigation management</li>
+        <li>Multi-branch operations</li>
+        <li>AI governance monitoring</li>
+        <li>Compliance automation</li>
+        <li>Predictive legal analytics</li>
+        <li>API integrations</li>
+        <li>Unlimited storage & users</li>
+        <li>Enterprise-grade security</li>
+        <li>Role-based access control</li>
+        <li>Dedicated account manager</li>
+        <li>24/7 enterprise support</li>
+      </ul>
+      <button class="price-cta">Transform Governance</button>
+    </div>
+    <div class="price-card reveal">
+      <div class="price-tier">Supreme AI</div>
+      <div class="price-name">Supreme AI</div>
+      <div class="price-for">National ecosystems & global enterprises</div>
+      <div class="price-amount" style="padding-top:0.5rem"><span class="price-num" style="font-size:1.8rem">Custom</span></div>
+      <div style="font-family:'SF Mono','Cascadia Code','Courier New',monospace;font-size:0.65rem;color:var(--gold);margin-bottom:1rem">Starting ₹25,00,000/year</div>
+      <div class="price-divider"></div>
+      <ul class="price-features">
+        <li>Custom AI infrastructure</li>
+        <li>Private cloud deployment</li>
+        <li>AI litigation prediction</li>
+        <li>National legal analytics</li>
+        <li>Blockchain audit systems</li>
+        <li>Military-grade security</li>
+        <li>White-label deployment</li>
+        <li>Custom AI legal models</li>
+        <li>Dedicated AI research lab</li>
+        <li>Global multi-region scaling</li>
+      </ul>
+      <button class="price-cta">Book Private Consultation</button>
+    </div>
+  </div>
+</section>
+
+<!-- ADDON SERVICES -->
+<section class="addons">
+  <div class="reveal">
+    <div class="section-label">Add-On Modules</div>
+    <h2 class="section-title">Premium <em>AI Modules</em><br>& Integrations</h2>
+  </div>
+  <table class="addons-table reveal">
+    <thead>
+      <tr><th>AI Module</th><th>Description</th><th>Monthly Price</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>AI Contract Intelligence</td><td>Automated contract review, risk scoring, and clause extraction</td><td class="price-col">₹24,999</td></tr>
+      <tr><td>AI Legal Translation Engine</td><td>Multilingual document translation with regional language support</td><td class="price-col">₹19,999</td></tr>
+      <tr><td>AI Compliance Monitoring</td><td>Real-time regulatory alerts and governance workflow automation</td><td class="price-col">₹39,999</td></tr>
+      <tr><td>AI Litigation Prediction</td><td>Predictive case outcome modelling using court analytics</td><td class="price-col">₹79,999</td></tr>
+      <tr><td>AI Voice-to-Text Legal Assistant</td><td>Real-time courtroom transcription and voice command system</td><td class="price-col">₹14,999</td></tr>
+      <tr><td>AI Court Analytics Dashboard</td><td>Deep analytics on court performance, judge patterns, timelines</td><td class="price-col">₹59,999</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- SECURITY -->
+<section class="security">
+  <div class="security-inner">
+    <div class="reveal">
+      <div class="section-label">Security & Compliance</div>
+      <h2 class="section-title">Enterprise-Grade <em>Legal</em><br>Data Protection</h2>
+      <p class="section-sub">Your legal data is protected by the same infrastructure standards trusted by global financial institutions — DPDP compliant, audit-ready, and impenetrable.</p>
+    </div>
+    <div class="security-badges reveal">
+      <div class="sec-badge">
+        <div class="sec-badge-icon">🔐</div>
+        <div class="sec-badge-title">DPDP Compliance</div>
+        <div class="sec-badge-desc">Full compliance with India's Digital Personal Data Protection Act — data sovereignty guaranteed.</div>
+      </div>
+      <div class="sec-badge">
+        <div class="sec-badge-icon">🛡️</div>
+        <div class="sec-badge-title">Military-Grade Encryption</div>
+        <div class="sec-badge-desc">AES-256 encryption at rest and in transit. Zero-knowledge architecture for sensitive legal data.</div>
+      </div>
+      <div class="sec-badge">
+        <div class="sec-badge-icon">📋</div>
+        <div class="sec-badge-title">Immutable Audit Trails</div>
+        <div class="sec-badge-desc">Every action logged, timestamped, and tamper-proof. Court-admissible audit documentation.</div>
+      </div>
+      <div class="sec-badge">
+        <div class="sec-badge-icon">👤</div>
+        <div class="sec-badge-title">Role-Based Access</div>
+        <div class="sec-badge-desc">Granular permission controls with multi-factor authentication and privilege separation.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials">
+  <div class="reveal" style="text-align:center;margin-bottom:3rem">
+    <div class="section-label" style="justify-content:center">Client Testimonials</div>
+    <h2 class="section-title" style="text-align:center">Trusted by <em>India's</em><br>Leading Legal Professionals</h2>
+  </div>
+  <div style="overflow:hidden">
+    <div class="testi-track">
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-text">"DLO has transformed how our bank manages 3,000+ recovery cases across 12 branches. The AI analytics alone saved us 40% in legal costs."</div><div class="testi-author"><div class="testi-avatar">R</div><div><div class="testi-name">Rajesh Sharma</div><div class="testi-role">Chief Legal Officer, Leading PSU Bank</div></div></div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-text">"The AI drafting assistant is extraordinary. Legal notices that took 3 hours now take 8 minutes, with better quality and zero compliance gaps."</div><div class="testi-author"><div class="testi-avatar">P</div><div><div class="testi-name">Priya Nair</div><div class="testi-role">Senior Advocate, Bombay High Court</div></div></div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-text">"As a university with 200+ ongoing litigations, DLO gave us complete visibility and control. The governance dashboards are world-class."</div><div class="testi-author"><div class="testi-avatar">A</div><div><div class="testi-name">Dr. Arun Kulkarni</div><div class="testi-role">Registrar, National Law University</div></div></div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-text">"DLO's enterprise package is not software — it's a complete legal operating system. Our NBFC now operates with zero compliance surprises."</div><div class="testi-author"><div class="testi-avatar">S</div><div><div class="testi-name">Suresh Mehta</div><div class="testi-role">MD, Leading NBFC</div></div></div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-text">"The predictive litigation analytics predicted our case outcomes with 89% accuracy. It fundamentally changed how we approach litigation strategy."</div><div class="testi-author"><div class="testi-avatar">V</div><div><div class="testi-name">Vikram Joshi</div><div class="testi-role">Managing Partner, VJ Law Associates</div></div></div></div>
+      <!-- duplicate for infinite scroll -->
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-text">"DLO has transformed how our bank manages 3,000+ recovery cases across 12 branches. The AI analytics alone saved us 40% in legal costs."</div><div class="testi-author"><div class="testi-avatar">R</div><div><div class="testi-name">Rajesh Sharma</div><div class="testi-role">Chief Legal Officer, Leading PSU Bank</div></div></div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-text">"The AI drafting assistant is extraordinary. Legal notices that took 3 hours now take 8 minutes, with better quality and zero compliance gaps."</div><div class="testi-author"><div class="testi-avatar">P</div><div><div class="testi-name">Priya Nair</div><div class="testi-role">Senior Advocate, Bombay High Court</div></div></div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-text">"As a university with 200+ ongoing litigations, DLO gave us complete visibility and control. The governance dashboards are world-class."</div><div class="testi-author"><div class="testi-avatar">A</div><div><div class="testi-name">Dr. Arun Kulkarni</div><div class="testi-role">Registrar, National Law University</div></div></div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-text">"DLO's enterprise package is not software — it's a complete legal operating system. Our NBFC now operates with zero compliance surprises."</div><div class="testi-author"><div class="testi-avatar">S</div><div><div class="testi-name">Suresh Mehta</div><div class="testi-role">MD, Leading NBFC</div></div></div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-text">"The predictive litigation analytics predicted our case outcomes with 89% accuracy. It fundamentally changed how we approach litigation strategy."</div><div class="testi-author"><div class="testi-avatar">V</div><div><div class="testi-name">Vikram Joshi</div><div class="testi-role">Managing Partner, VJ Law Associates</div></div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- VISION -->
+<section class="vision">
+  <div class="section-label" style="justify-content:center;position:relative;z-index:2">AI Future Vision</div>
+  <h2 class="vision-headline reveal" style="position:relative;z-index:2">Building the Future of <em>Global Legal Intelligence</em></h2>
+  <p class="vision-sub reveal" style="position:relative;z-index:2">From smart digital courts to AI-governed legal ecosystems — DLO is engineering the infrastructure of tomorrow's legal world, today.</p>
+  <a href="#contact" class="btn-primary" style="position:relative;z-index:2">Join the Legal Revolution →</a>
+  <div class="vision-grid" style="position:relative;z-index:2">
+    <div class="vision-item reveal"><div class="vision-item-icon">🏛️</div><div class="vision-item-label">Smart Digital Courts</div></div>
+    <div class="vision-item reveal"><div class="vision-item-icon">🤖</div><div class="vision-item-label">AI Legal Automation</div></div>
+    <div class="vision-item reveal"><div class="vision-item-icon">🌐</div><div class="vision-item-label">Global Legal Cloud</div></div>
+    <div class="vision-item reveal"><div class="vision-item-icon">⛓️</div><div class="vision-item-label">Blockchain Audit</div></div>
+    <div class="vision-item reveal"><div class="vision-item-icon">🛰️</div><div class="vision-item-label">National Legal Network</div></div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="contact" id="contact">
+  <div class="contact-inner">
+    <div class="reveal">
+      <div class="section-label">Get Started</div>
+      <h2 class="section-title">Start Your <em>AI Legal</em><br>Transformation</h2>
+      <p class="section-sub">Book a private consultation or enterprise demo. Our legal AI experts will design a custom solution for your specific requirements.</p>
+      <div class="contact-info" style="margin-top:2.5rem">
+        <div class="contact-item">
+          <div class="contact-icon">📧</div>
+          <div><div class="contact-detail-label">Email</div><div class="contact-detail-val">warrior@dlo.legal</div></div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">💬</div>
+          <div><div class="contact-detail-label">WhatsApp Enterprise</div><div class="contact-detail-val">+91 98XXX XXXXX</div></div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">🏛️</div>
+          <div><div class="contact-detail-label">Headquarters</div><div class="contact-detail-val">Hubballi, Karnataka, India</div></div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">⏰</div>
+          <div><div class="contact-detail-label">Response Time</div><div class="contact-detail-val">Within 2 business hours</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="reveal">
+      <div style="background:var(--light);border:1px solid rgba(0,0,0,0.06);border-radius:12px;padding:2.5rem">
+        <div style="font-family:Georgia,'Palatino Linotype',serif;font-size:1.4rem;margin-bottom:2rem;color:var(--charcoal)">Book Enterprise Demo</div>
+        <div class="contact-form">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+            <div class="form-group"><label class="form-label">Full Name</label><input type="text" class="form-input" placeholder="Your name"></div>
+            <div class="form-group"><label class="form-label">Organisation</label><input type="text" class="form-input" placeholder="Company / Firm"></div>
+          </div>
+          <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" placeholder="professional@company.com"></div>
+          <div class="form-group"><label class="form-label">Phone</label><input type="tel" class="form-input" placeholder="+91 XXXXX XXXXX"></div>
+          <div class="form-group">
+            <label class="form-label">Package Interest</label>
+            <select class="form-select form-input">
+              <option value="">Select a package...</option>
+              <option>Starter — ₹9,999/month</option>
+              <option>Professional — ₹49,999/month</option>
+              <option>Enterprise — ₹2,99,999/month</option>
+              <option>Supreme AI — Custom Pricing</option>
+              <option>Individual Legal Services</option>
+            </select>
+          </div>
+          <div class="form-group"><label class="form-label">Message</label><textarea class="form-textarea" placeholder="Describe your legal operations requirements..."></textarea></div>
+          <button class="btn-primary" style="width:100%;justify-content:center;cursor:none">Submit Enterprise Enquiry →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="footer-logo">Warrior's <em style="font-style:italic;color:var(--gold-light)">DLO</em></div>
+      <div class="footer-tagline">India's Next-Generation AI Legal Operating System. Transforming legal operations through intelligence, automation, and enterprise governance.</div>
+      <div class="footer-tags">
+        <span class="footer-tag">BSL Certified</span>
+        <span class="footer-tag">DPDP Compliant</span>
+        <span class="footer-tag">Enterprise Grade</span>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-title">Solutions</div>
+      <ul class="footer-links">
+        <li><a href="#">AI Case Management</a></li>
+        <li><a href="#">AI Drafting Assistant</a></li>
+        <li><a href="#">Legal Governance</a></li>
+        <li><a href="#">AI Legal Research</a></li>
+        <li><a href="#">Billing System</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Industries</div>
+      <ul class="footer-links">
+        <li><a href="#">Banks & NBFCs</a></li>
+        <li><a href="#">Insurance</a></li>
+        <li><a href="#">Universities</a></li>
+        <li><a href="#">Government</a></li>
+        <li><a href="#">Law Firms</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Company</div>
+      <ul class="footer-links">
+        <li><a href="#">About Warrior</a></li>
+        <li><a href="#">Pricing</a></li>
+        <li><a href="#">Case Studies</a></li>
+        <li><a href="#">Legal Insights Blog</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy">© 2024 Warrior's Digital Law Office (DLO). All rights reserved.</div>
+    <div class="footer-legal">
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms of Service</a>
+      <a href="#">Data Protection</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Custom Cursor
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursorRing');
+let mx = 0, my = 0, rx = 0, ry = 0;
+
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  cursor.style.left = mx - 4 + 'px';
+  cursor.style.top = my - 4 + 'px';
+});
+
+function animRing() {
+  rx += (mx - rx) * 0.12;
+  ry += (my - ry) * 0.12;
+  ring.style.left = rx - 18 + 'px';
+  ring.style.top = ry - 18 + 'px';
+  requestAnimationFrame(animRing);
+}
+animRing();
+
+document.querySelectorAll('a, button, .service-card, .ai-card, .industry-card, .price-card').forEach(el => {
+  el.addEventListener('mouseenter', () => { ring.style.transform = 'scale(1.8)'; ring.style.borderColor = 'rgba(154,123,46,0.7)'; });
+  el.addEventListener('mouseleave', () => { ring.style.transform = 'scale(1)'; ring.style.borderColor = 'rgba(154,123,46,0.4)'; });
+});
+
+// Scroll Reveal
+const reveals = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry, i) => {
+    if (entry.isIntersecting) {
+      setTimeout(() => entry.target.classList.add('visible'), i * 80);
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+
+reveals.forEach(el => observer.observe(el));
+
+// Nav scroll effect
+const nav = document.querySelector('nav');
+window.addEventListener('scroll', () => {
+  nav.style.background = window.scrollY > 50 ? 'rgba(255,255,255,0.97)' : 'rgba(255,255,255,0.85)';
+  nav.style.boxShadow = window.scrollY > 50 ? '0 2px 20px rgba(0,0,0,0.06)' : 'none';
+});
+
+// Smooth scroll for nav links
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const target = document.querySelector(a.getAttribute('href'));
+    if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth' }); }
+  });
+});
+</script>
+</body>
+</html>
